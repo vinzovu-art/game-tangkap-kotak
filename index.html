@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Tangkap Kotak</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .card {
+      width: min(95vw, 430px);
+      background: #1f2937;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 0 0 10px;
+      text-align: center;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    #gameArea {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      background: linear-gradient(180deg, #0ea5e9, #2563eb);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 3px solid rgba(255,255,255,0.2);
+    }
+
+    #target {
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      border: none;
+      border-radius: 18px;
+      background: #f59e0b;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+      display: none;
+      cursor: pointer;
+    }
+
+    #target:active {
+      transform: scale(0.9);
+    }
+
+    .controls {
+      margin-top: 14px;
+    }
+
+    #startBtn {
+      width: 100%;
+      font-size: 18px;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 12px;
+      background: #22c55e;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #startBtn:disabled {
+      background: #4b5563;
+      cursor: not-allowed;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 12px;
+      min-height: 24px;
+      font-size: 16px;
+    }
+
+    .small {
+      opacity: 0.7;
+      font-size: 13px;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎯 Game Tangkap Kotak</h1>
+
+    <div class="info">
+      <div>Skor: <span id="score">0</span></div>
+      <div>Waktu: <span id="time">20</span>s</div>
+    </div>
+
+    <div id="gameArea">
+      <button id="target"></button>
+    </div>
+
+    <div class="controls">
+      <button id="startBtn">▶ Mulai Game</button>
+    </div>
+
+    <div id="message">
+      Tekan "Mulai Game" lalu sentuh kotak oranye secepat mungkin!
+    </div>
+
+    <div class="small">
+      Dibuat dengan GitHub Pages
+    </div>
+  </div>
+
+  <script>
+    const gameArea = document.getElementById("gameArea");
+    const target   = document.getElementById("target");
+    const scoreEl  = document.getElementById("score");
+    const timeEl   = document.getElementById("time");
+    const startBtn = document.getElementById("startBtn");
+    const msgEl    = document.getElementById("message");
+
+    let score    = 0;
+    let timeLeft = 20;
+    let timer    = null;
+    let playing  = false;
+
+    function moveTarget() {
+      const maxX = gameArea.clientWidth  - target.offsetWidth;
+      const maxY = gameArea.clientHeight - target.offsetHeight;
+      target.style.left = Math.random() * maxX + "px";
+      target.style.top  = Math.random() * maxY + "px";
+    }
+
+    function endGame() {
+      playing = false;
+      clearInterval(timer);
+      target.style.display = "none";
+      startBtn.disabled    = false;
+      startBtn.textContent = "🔄 Main Lagi";
+
+      let pesan = "";
+      if (score >= 20) pesan = "Luar biasa! 🏆";
+      else if (score >= 10) pesan = "Bagus sekali! 👍";
+      else pesan = "Ayo coba lagi! 💪";
+
+      msgEl.textContent = pesan + " Skor kamu: " + score;
+    }
+
+    function startGame() {
+      score    = 0;
+      timeLeft = 20;
+      playing  = true;
+
+      scoreEl.textContent  = score;
+      timeEl.textContent   = timeLeft;
+      startBtn.disabled    = true;
+      startBtn.textContent = "▶ Mulai Game";
+      target.style.display = "block";
+      msgEl.textContent    = "Sentuh kotak oranye sebanyak mungkin!";
+
+      moveTarget();
+      clearInterval(timer);
+
+      timer = setInterval(() => {
+        timeLeft--;
+        timeEl.textContent = timeLeft;
+        if (timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    target.addEventListener("click", () => {
+      if (!playing) return;
+      score++;
+      scoreEl.textContent = score;
+      moveTarget();
+    });
+
+    startBtn.addEventListener("click", startGame);
+  </script>
+</body>
+</html>
